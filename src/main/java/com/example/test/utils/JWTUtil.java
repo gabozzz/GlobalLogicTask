@@ -1,9 +1,11 @@
 package com.example.test.utils;
 
+import com.example.test.exception.GlobalLogicException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
@@ -32,10 +34,16 @@ public class JWTUtil {
 
 
     public static String validateAndExtractUserId(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        try {
+            return Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        }catch (Exception ex){
+            throw  new GlobalLogicException("",400,
+                    "Error al validar JWT", HttpStatus.UNAUTHORIZED);
+        }
+
     }
 }

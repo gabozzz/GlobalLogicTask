@@ -14,8 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
-    @Autowired
     private UserService userService;
+
+
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/sign-up")
     public ResponseEntity<SavedUser> signUp(@RequestBody Userdata newUser) {

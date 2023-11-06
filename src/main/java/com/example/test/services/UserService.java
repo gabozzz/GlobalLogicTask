@@ -3,7 +3,6 @@ package com.example.test.services;
 import com.example.test.dtos.SavedUser;
 import com.example.test.entities.Userdata;
 import com.example.test.exception.GlobalLogicException;
-import com.example.test.repository.PhoneRepository;
 import com.example.test.repository.UserRepository;
 import com.example.test.utils.JWTUtil;
 import com.example.test.utils.PasswordEncoder;
@@ -13,19 +12,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private PhoneRepository phoneRepository;
 
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public SavedUser signUp(Userdata newUser) {
         if (!ValidationUtil.isValidEmail(newUser.getEmail())) {
@@ -70,7 +69,9 @@ public class UserService {
         newUser.setLastLogin(LocalDate.now());
         String token = JWTUtil.generateToken(String.valueOf(newUser.getId()));
         newUser.setToken(token);
-        newUser.getPhones().parallelStream().forEach(phone -> phone.setUserId(newUser.getId())); // Establecer el userId en cada teléfono
+        if(newUser.getPhones()!=null){
+            newUser.getPhones().parallelStream().forEach(phone -> phone.setUserId(newUser.getId())); // Establecer el userId en cada teléfono
+        }
         Userdata savedUser = userRepository.save(newUser);
         return savedUser;
     }
